@@ -31,11 +31,16 @@ public class GameController : MonoBehaviour {
     }
 
     private void Start() {
-        Simulation = true;
+        instance.simulation = true;
+        instance.inputHandler.enabled = false;
+        instance.autoController.enabled = true;
+        instance.menuHandler.Hidden = false;
+        instance.scoreLabel.DisplayHighscore = true;
+        instance.playerController.ResetRotation();
     }
 
 
-    public static bool Simulation {
+    public static bool DeathScreen {
         get => instance.simulation;
         set {
             instance.simulation = value;
@@ -44,13 +49,19 @@ public class GameController : MonoBehaviour {
             instance.menuHandler.Hidden = !value;
             instance.scoreLabel.DisplayHighscore = value;
 
+            // When in game and playing
             if (!value) instance.scoreLabel.Score = 0;
-            
+
             // Destroy all enemies, reset player and spawner
             foreach (var enemy in FindObjectsOfType<Enemy>()) Destroy(enemy.gameObject);
-            
-            instance.playerController.ResetRotation();
-            instance.enemySpawner.Restart();
+
+            if (!value) {
+                instance.playerController.ResetRotation();
+                instance.enemySpawner.Restart(); 
+            }
+
+            instance.collisionHandler.Dead = value;
+            instance.enemySpawner.enabled = !value;
         }
     }
 
@@ -63,6 +74,6 @@ public class GameController : MonoBehaviour {
     private void OnCollided(Enemy enemy) {
         Destroy(enemy.gameObject);
 
-        Simulation = true;
+        DeathScreen = true;
     }
 }

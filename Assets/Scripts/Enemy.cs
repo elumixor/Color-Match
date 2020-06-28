@@ -3,22 +3,39 @@ using System.Collections;
 using System.Collections.Generic;
 using Common;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Enemy : MonoBehaviour {
-    [SerializeField] private CollisionColor collisionColor;
+    [SerializeField] private float fadeInTime;
+    public float velocity = 50f;
+
+    public CollisionColor collisionColor;
+    private float startTime;
+    private bool fading = true;
+    
     private static readonly int ColorShader = Shader.PropertyToID("_Color");
 
-    public CollisionColor Color {
-        get => collisionColor;
-        set {
-            collisionColor = value;
-            GetComponent<Renderer>().material.SetColor(ColorShader, collisionColor.color);
-        }
+    private void Start() {
+        var c = collisionColor.color;
+        c.a = 0f;
+        GetComponent<Renderer>().material.SetColor(ColorShader, c);
+        startTime = Time.time;
+        
+        var rb = GetComponent<Rigidbody2D>();
+        rb.angularVelocity = (Random.Range(0, 2) * 2 - 1) * Random.Range(90f, 180f);
+        rb.velocity = Vector2.down * velocity;
     }
 
-    public event Action OnDestroyed;
+    private void Update() {
+        if (!fading) return;
+        
+        var color = collisionColor.color;
+        var delta = Mathf.Clamp01((Time.time - startTime) / fadeInTime);
+        color.a = delta;
+        GetComponent<Renderer>().material.SetColor(ColorShader, color);
 
-    private void OnDestroy() {
-        OnDestroyed?.Invoke();
+        if (delta >= 1f) {
+            fading = false;
+        }
     }
 }

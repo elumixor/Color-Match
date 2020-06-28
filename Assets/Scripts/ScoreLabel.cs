@@ -34,6 +34,10 @@ public class ScoreLabel : MonoBehaviour {
         }
     }
 
+    public Color Color {
+        set => label.faceColor = value;
+    }
+
     private void Awake() {
         label = GetComponent<TMPro.TextMeshProUGUI>();
         highscore = PlayerPrefs.GetInt("highscore", 0);

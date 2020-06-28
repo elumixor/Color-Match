@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace Player {
     public class PlayerController : MonoBehaviour {
+        [SerializeField] private ScoreLabel scoreLabel;
         [SerializeField, Range(10e-5f, 10f)] private float rotationTime = 1f;
 
         private CollisionColor color = CollisionColor.Orange;
@@ -47,13 +48,17 @@ namespace Player {
             startTime = Time.time;
             endTime = Time.time + rotationTime;
             delta = (endAngle - CurrentAngle + angle) / rotationTime;
-            endAngle = (endAngle + angle) % 360;
+            endAngle = (360 + endAngle + angle) % 360;
             rotating = true;
+
+            scoreLabel.Color = color.color;
         }
 
         public void ResetRotation() {
+            rotating = false;
             color = CollisionColor.Orange;
-            transform.localRotation = Quaternion.Euler(0, 180, 0);
+            CurrentAngle = endAngle = 180f;
+            scoreLabel.Color = color.color;
         }
 
         private void Update() {

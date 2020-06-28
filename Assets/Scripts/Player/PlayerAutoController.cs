@@ -42,7 +42,7 @@ namespace Player {
         }
 
         private void ReactToEnemy(Enemy enemy) {
-            var colorDistance = playerController.Color - enemy.Color;
+            var colorDistance = playerController.Color - enemy.collisionColor;
 
             if (Math.Abs(colorDistance) == 2) playerController.Flip();
             else {
