@@ -2,13 +2,15 @@
 using System.Security.Cryptography;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
+
 
 [RequireComponent(typeof(PlayerController))]
 public class PlayerCollisionHandler : MonoBehaviour {
-    [SerializeField] private TextMeshProUGUI scoreText;
+    public event Action<Enemy> OnPassed;
+    public event Action<Enemy> OnCollided;
 
     private PlayerController playerController;
-    private int score = 0;
 
     private void Awake() {
         playerController = GetComponent<PlayerController>();
@@ -16,30 +18,13 @@ public class PlayerCollisionHandler : MonoBehaviour {
 
     private void OnCollisionEnter2D(Collision2D other) {
         if (other.gameObject.CompareTag("Enemy")) {
-            var enemyColor = other.gameObject.GetComponent<Enemy>().Color;
-            if (enemyColor == playerController.Color) {
-                Passed(other.gameObject);
-            } else {
-                Collided(other.gameObject);
-            }
+            var enemy = other.gameObject.GetComponent<Enemy>();
+
+            var enemyColor = enemy.Color;
+            if (enemyColor == playerController.Color)
+                OnPassed?.Invoke(enemy);
+            else
+                OnCollided?.Invoke(enemy);
         }
-    }
-
-    private void Passed(GameObject enemy) {
-        Destroy(enemy);
-        score += 1;
-        UpdateScoreText();
-    }
-
-    private void Collided(GameObject enemy) {
-        Destroy(enemy);
-        score = 0;
-        UpdateScoreText();    
-        // Destroy(gameObject);
-        playerController.ResetColor();
-    }
-
-    private void UpdateScoreText() {
-        scoreText.text = score.ToString();
     }
 }

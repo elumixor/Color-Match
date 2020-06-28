@@ -5,15 +5,31 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour {
     [SerializeField] private Enemy enemyPrefab;
+    [SerializeField] private float spawnTime = 5f;
+    [SerializeField] private float startVelocity = 50f;
+    
+
+    private float lastSpawnTime;
 
     private void Start() {
-        Spawn();
+        lastSpawnTime = Time.time - spawnTime;
+    }
+
+    private void Update() {
+        if (lastSpawnTime + spawnTime <= Time.time) {
+            Spawn();
+            lastSpawnTime = Time.time;
+        }
     }
 
     private void Spawn() {
         var instance = Instantiate(enemyPrefab, transform);
-        instance.Color = new System.Random().NextEnum<CollisionColor>();
-        instance.GetComponent<Rigidbody2D>().velocity = Vector2.down * 50;
-        instance.OnDestroyed += Spawn;
+        instance.Color = CollisionColor.Random;
+        instance.GetComponent<Rigidbody2D>().velocity = Vector2.down * startVelocity;
+    }
+
+    public void Restart() {
+        // Destroy current enemies
+        lastSpawnTime = Time.time - spawnTime;
     }
 }

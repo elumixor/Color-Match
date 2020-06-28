@@ -1,58 +1,42 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
-public enum CollisionColor {
-    Orange,
-    Blue,
-    Purple,
-    Green
-}
+[Serializable]
+public struct CollisionColor {
+    public static readonly CollisionColor Orange = new CollisionColor(new Color(1f, 0.62f, 0.05f), 0);
+    public static readonly CollisionColor Blue = new CollisionColor(new Color(0.05f, 0.66f, 1f), 1);
+    public static readonly CollisionColor Purple = new CollisionColor(new Color(1f, 0.14f, .76f), 2);
+    public static readonly CollisionColor Green = new CollisionColor(new Color(0.25f, 0.81f, 0.41f), 3);
 
-public static class EnemyColorExtensions {
-    public static Color Color(this CollisionColor collisionColor) {
-        switch (collisionColor) {
-            case CollisionColor.Orange:
-                return GameData.Colors.Orange;
-            case CollisionColor.Blue:
-                return GameData.Colors.Blue;
-            case CollisionColor.Purple:
-                return GameData.Colors.Purple;
-            case CollisionColor.Green:
-                return GameData.Colors.Green;
-        }
+    public readonly Color color;
+    public readonly int order;
 
-        throw new InvalidEnumArgumentException("Invalid enemy color type");
+    public CollisionColor(Color color, int order) {
+        this.color = color;
+        this.order = order;
     }
 
-    public static CollisionColor Next(this CollisionColor collisionColor) {
-        switch (collisionColor) {
-            case CollisionColor.Orange:
-                return CollisionColor.Blue;
-            case CollisionColor.Blue:
-                return CollisionColor.Purple;
-            case CollisionColor.Purple:
-                return CollisionColor.Green;
-            case CollisionColor.Green:
-                return CollisionColor.Orange;
-        }
+    public CollisionColor Next => byInt[(order + 1) % 4];
+    public CollisionColor Previous => byInt[(4 + order - 1) % 4];
+    public CollisionColor Flip => byInt[(order + 2) % 4];
+    public static CollisionColor Random => byInt[UnityEngine.Random.Range(0, 4)];
 
-        throw new InvalidEnumArgumentException("Invalid enemy color type");
-    }
 
-    public static CollisionColor Previous(this CollisionColor collisionColor) {
-        switch (collisionColor) {
-            case CollisionColor.Orange:
-                return CollisionColor.Green;
-            case CollisionColor.Blue:
-                return CollisionColor.Orange;
-            case CollisionColor.Purple:
-                return CollisionColor.Blue;
-            case CollisionColor.Green:
-                return CollisionColor.Purple;
-        }
+    public static Dictionary<int, CollisionColor> byInt = new Dictionary<int, CollisionColor>
+        {{0, Orange}, {1, Blue}, {2, Purple}, {3, Green}};
 
-        throw new InvalidEnumArgumentException("Invalid enemy color type");
-    }
-    
-    
+    public static int operator -(CollisionColor a, CollisionColor b) => a.order - b.order;
+
+    public static bool operator ==(CollisionColor a, CollisionColor b) => a.order == b.order;
+
+    public static bool operator !=(CollisionColor a, CollisionColor b) => !(a == b);
+
+    public bool Equals(CollisionColor other) => order == other.order;
+
+    public override bool Equals(object obj) => obj is CollisionColor other && Equals(other);
+
+    public override int GetHashCode() => order;
+
+    public override string ToString() => $"{order} {color}";
 }

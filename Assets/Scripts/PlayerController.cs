@@ -4,28 +4,18 @@ public class PlayerController : MonoBehaviour {
     private CollisionColor color = CollisionColor.Orange;
     public CollisionColor Color => color;
 
-    private void Update() {
-        if (Input.GetMouseButtonDown(0))
-            RotateLeft();
-        else if (Input.GetMouseButtonDown(1))
-            RotateRight();
-        else if (Input.GetMouseButtonDown(2)) {
-            Flip();
-        }
-    }
-
-    private void RotateLeft() {
-        color = color.Previous();
-        Rotate(90f);
-    }
-
-    private void RotateRight() {
-        color = color.Next();
+    public void RotateLeft() {
+        color = color.Next;
         Rotate(-90f);
     }
 
-    private void Flip() {
-        color = color.Next().Next();
+    public void RotateRight() {
+        color = color.Previous;
+        Rotate(90f);
+    }
+
+    public void Flip() {
+        color = color.Flip;
         Rotate(180f);
     }
 
@@ -34,7 +24,7 @@ public class PlayerController : MonoBehaviour {
         transform.localRotation = Quaternion.Euler(0, angles.y + angle, 0);
     }
 
-    public void ResetColor() {
+    public void ResetRotation() {
         color = CollisionColor.Orange;
         transform.localRotation = Quaternion.Euler(0, 180, 0);
     }

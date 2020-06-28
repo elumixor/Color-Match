@@ -11,7 +11,7 @@ public class Enemy : MonoBehaviour {
         get => collisionColor;
         set {
             collisionColor = value;
-            GetComponent<Renderer>().material.SetColor(ColorShader, collisionColor.Color());
+            GetComponent<Renderer>().material.SetColor(ColorShader, collisionColor.color);
         }
     }
 
