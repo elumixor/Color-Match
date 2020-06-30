@@ -34,7 +34,6 @@ public class GameController : MonoBehaviour {
         instance.simulation = true;
         instance.inputHandler.enabled = false;
         instance.autoController.enabled = true;
-        instance.menuHandler.Hidden = false;
         instance.scoreLabel.DisplayHighscore = true;
         instance.playerController.ResetRotation();
     }
@@ -46,7 +45,10 @@ public class GameController : MonoBehaviour {
             instance.simulation = value;
             instance.inputHandler.enabled = !value;
             instance.autoController.enabled = value;
-            instance.menuHandler.Hidden = !value;
+            
+            if (value) instance.menuHandler.Show();
+            else instance.menuHandler.Hide();
+
             instance.scoreLabel.DisplayHighscore = value;
 
             // When in game and playing

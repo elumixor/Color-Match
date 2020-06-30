@@ -11,22 +11,53 @@ public class MenuHandler : MonoBehaviour {
     [SerializeField] private List<GameObject> hideStart;
     [SerializeField] private List<GameObject> toggleWinLose;
 
+    // Items for animation
+    [SerializeField] private Animator tapIcon;
+    [SerializeField] private Animator swipeLeft;
+    [SerializeField] private Animator swipeRight;
+    [SerializeField] private Animator gameLabel;
+    [SerializeField] private Animator scoreLabel;
+    [SerializeField] private Animator tryAgainLabel;
+
+
     private bool firstStart = true;
     private bool hidden;
+    
+    private static readonly int Displayed = Animator.StringToHash("Displayed");
+    private static readonly int Pressed = Animator.StringToHash("Pressed");
+    private static readonly int Hidden = Animator.StringToHash("Hidden");
 
-    public bool Hidden {
-        set {
-            hidden = value;
+    private void FirstClick() {
+        tapIcon.SetTrigger(Pressed);
+        swipeLeft.SetTrigger(Hidden);
+        swipeRight.SetTrigger(Hidden);
 
-            if (firstStart) {
-                foreach (var h in hideStart) h.SetActive(!hidden);
+        gameLabel.SetBool(Displayed, false);
+        scoreLabel.SetBool(Displayed, false);
 
-                if (hidden)
-                    firstStart = false;
-            } else
-                foreach (var h in toggleWinLose)
-                    h.SetActive(!hidden);
+        hidden = true;
+    }
+
+    public void Show() {
+        gameLabel.SetBool(Displayed, true);
+        scoreLabel.SetBool(Displayed, true);
+        tryAgainLabel.SetBool(Displayed, true);
+        
+        hidden = false;
+    }
+
+    public void Hide() {
+        if (firstStart) {
+            FirstClick();
+            firstStart = false;
+            return;
         }
+
+        tryAgainLabel.SetBool(Displayed, false);
+        gameLabel.SetBool(Displayed, false);
+        scoreLabel.SetBool(Displayed, false);
+        
+        hidden = true;
     }
 
     private void Update() {

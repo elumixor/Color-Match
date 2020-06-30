@@ -7,6 +7,8 @@ using Random = UnityEngine.Random;
 
 public class Enemy : MonoBehaviour {
     [SerializeField] private float fadeInTime;
+    [SerializeField] private ParticleSystem deathParticleSystem;
+    
     public float velocity = 50f;
 
     public CollisionColor collisionColor;
@@ -37,5 +39,12 @@ public class Enemy : MonoBehaviour {
         if (delta >= 1f) {
             fading = false;
         }
+    }
+
+    private void OnDestroy() {
+        var transform1 = transform;
+        var particles = Instantiate(deathParticleSystem, transform1.position, Quaternion.identity);
+        var particlesMain = particles.main;
+        particlesMain.startColor = new ParticleSystem.MinMaxGradient(collisionColor.color);
     }
 }
