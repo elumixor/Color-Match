@@ -3,9 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using Common;
+using DefaultNamespace;
 using UnityEngine;
 
-public class EnemySpawner : MonoBehaviour {
+public class EnemySpawner : SingletonBehaviour<EnemySpawner> {
     [SerializeField] private Enemy enemyPrefab;
     [SerializeField, Range(1e-3f, 2f)] private float spawnFrequency = 1f;
     [SerializeField, Range(1f, 500f)] private float startVelocity = 50f;
@@ -13,8 +14,9 @@ public class EnemySpawner : MonoBehaviour {
 
     private float frequency;
     private float lastSpawnTime;
-
-    private void Awake() {
+    
+    protected override void Awake() {
+        base.Awake();
         frequency = spawnFrequency;
     }
 
@@ -24,21 +26,16 @@ public class EnemySpawner : MonoBehaviour {
 
     private void Update() {
         frequency *= increaseFactor;
-        if (lastSpawnTime + spawnFrequency <= Time.time) {
+        if (lastSpawnTime + frequency <= Time.time) {
             Spawn();
             lastSpawnTime = Time.time;
         }
     }
 
-    private void Spawn() {
-        var instance = Instantiate(enemyPrefab, transform);
-        instance.collisionColor = CollisionColor.Random;
-        instance.velocity = startVelocity;
-    }
+    private void Spawn() => Enemy.Spawn(enemyPrefab, transform, CollisionColor.Random, startVelocity);
 
-    public void Restart() {
-        // Destroy current enemies
-        lastSpawnTime = Time.time - spawnFrequency;
-        frequency = spawnFrequency;
+    public static void Restart() {
+        instance.lastSpawnTime = Time.time - instance.spawnFrequency;
+        instance.frequency = instance.spawnFrequency;
     }
 }

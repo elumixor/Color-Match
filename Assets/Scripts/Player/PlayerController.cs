@@ -1,21 +1,44 @@
 ﻿using System;
 using System.Collections;
 using Common;
+using DefaultNamespace;
+using UnityEditor.Recorder.Input;
 using UnityEngine;
 
 namespace Player {
-    public class PlayerController : MonoBehaviour {
-        [SerializeField] private ScoreLabel scoreLabel;
-        [SerializeField, Range(10e-5f, 10f)] private float rotationTime = 1f;
+    public class PlayerController : SingletonBehaviour<PlayerController> {
+        public static CollisionColor Color {
+            get {
+                var angle = instance.CurrentAngle;
+                return angle > 315f ? CollisionColor.Pink :
+                    angle > 225f ? CollisionColor.Green :
+                    angle > 135f ? CollisionColor.Orange :
+                    angle > 45f ? CollisionColor.Blue : CollisionColor.Pink;
+            }
+        }
 
-        private CollisionColor color = CollisionColor.Orange;
-        public CollisionColor Color => color;
+        public static void RotateLeft() {
+            instance.Rotate(-90f);
+        }
+
+        public static void RotateRight() {
+            instance.Rotate(90f);    
+        }
+
+        public static void ResetRotation() {
+            instance.rotating = false;
+            instance.rotation = instance.CurrentAngle = instance.endAngle = instance.initialRotation;
+        }
+
+        [SerializeField, Range(10e-5f, 10f)] private float rotationTime = 0.1f;
 
         private float delta;
         private float startTime;
         private float endTime;
         private float endAngle;
-        private bool rotating = false;
+        private bool rotating;
+        private float rotation;
+        private float initialRotation;
 
         private float CurrentAngle {
             get => transform.localRotation.eulerAngles.y;
@@ -25,40 +48,19 @@ namespace Player {
             }
         }
 
-        private void Awake() {
-            endAngle = CurrentAngle;
+        protected override void Awake() {
+            base.Awake();
+            initialRotation = CurrentAngle;
+            endAngle = rotation = initialRotation;
         }
 
-        public void RotateLeft() {
-            color = color.Next;
-            Rotate(-90f);
-        }
-
-        public void RotateRight() {
-            color = color.Previous;
-            Rotate(90f);
-        }
-
-        public void Flip() {
-            color = color.Flip;
-            Rotate(180f);
-        }
 
         private void Rotate(float angle) {
             startTime = Time.time;
             endTime = Time.time + rotationTime;
-            delta = (endAngle - CurrentAngle + angle) / rotationTime;
-            endAngle = (360 + endAngle + angle) % 360;
+            delta = (endAngle - rotation + angle) / rotationTime;
+            endAngle += angle;
             rotating = true;
-
-            scoreLabel.Color = color.color;
-        }
-
-        public void ResetRotation() {
-            rotating = false;
-            color = CollisionColor.Orange;
-            CurrentAngle = endAngle = 180f;
-            scoreLabel.Color = color.color;
         }
 
         private void Update() {
@@ -69,13 +71,14 @@ namespace Player {
             var angle = delta * elapsed;
 
             if (time >= endTime) {
-                CurrentAngle = endAngle;
+                CurrentAngle = rotation = endAngle;
                 rotating = false;
                 return;
             }
 
             startTime = time;
-            CurrentAngle += angle;
+            rotation += angle;
+            CurrentAngle = rotation;
         }
     }
 }

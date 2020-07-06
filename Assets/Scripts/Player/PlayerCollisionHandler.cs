@@ -1,21 +1,21 @@
 ﻿using System;
+using DefaultNamespace;
 using UnityEngine;
 
 namespace Player {
     [RequireComponent(typeof(PlayerController))]
-    public class PlayerCollisionHandler : MonoBehaviour {
+    public class PlayerCollisionHandler : SingletonBehaviour<PlayerCollisionHandler> {
         private Animator animator;
-        public event Action<Enemy> OnPassed;
-        public event Action<Enemy> OnCollided;
-
-        private PlayerController playerController;
+        private static readonly int DeadID = Animator.StringToHash("Dead");
+        public static event Action<Enemy> OnPassed = delegate { };
+        public static event Action<Enemy> OnCollided = delegate { };
 
         public bool Dead {
-            set { animator.SetBool("Dead", value); }
+            set => animator.SetBool(DeadID, value);
         }
 
-        private void Awake() {
-            playerController = GetComponent<PlayerController>();
+        protected override void Awake() {
+            base.Awake();
             animator = GetComponent<Animator>();
         }
 
@@ -24,11 +24,10 @@ namespace Player {
                 var enemy = other.gameObject.GetComponent<Enemy>();
 
                 var enemyColor = enemy.collisionColor;
-                if (enemyColor == playerController.Color)
-                    OnPassed?.Invoke(enemy);
-                else {
-                    OnCollided?.Invoke(enemy);
-                }
+                if (enemyColor == PlayerController.Color)
+                    OnPassed(enemy);
+                else
+                    OnCollided(enemy);
             }
         }
     }

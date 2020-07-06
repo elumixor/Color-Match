@@ -1,25 +1,25 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using DefaultNamespace;
 using UnityEngine;
 
-[RequireComponent(typeof(TMPro.TextMeshProUGUI))]
-public class ScoreLabel : MonoBehaviour {
-    private TMPro.TextMeshProUGUI label;
-    private int highscore;
-    private int score;
+public class ScoreLabel : SingletonBehaviour<ScoreLabel> {
+    [SerializeField] private TMPro.TextMeshProUGUI label;
 
-    private bool displayHighscore = true;
+    private static int highscore;
+    private static int score;
+    private static bool displayHighscore = true;
 
-    public bool DisplayHighscore {
+    public static bool DisplayHighscore {
         set {
-            label.text = value ? highscore.ToString() : score.ToString();
+            instance.label.text = value ? highscore.ToString() : score.ToString();
 
             displayHighscore = value;
         }
     }
 
-    public int Score {
+    public static int Score {
         get => score;
         set {
             score = value;
@@ -29,7 +29,7 @@ public class ScoreLabel : MonoBehaviour {
             }
 
             if (!displayHighscore) {
-                label.text = score.ToString();
+                instance.label.text = score.ToString();
             }
         }
     }
@@ -38,8 +38,8 @@ public class ScoreLabel : MonoBehaviour {
         set => label.faceColor = value;
     }
 
-    private void Awake() {
-        label = GetComponent<TMPro.TextMeshProUGUI>();
+    protected override void Awake() {
+        base.Awake();
         highscore = PlayerPrefs.GetInt("highscore", 0);
         label.text = highscore.ToString();
     }

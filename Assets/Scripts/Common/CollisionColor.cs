@@ -7,7 +7,7 @@ namespace Common {
     public struct CollisionColor {
         public static readonly CollisionColor Orange = new CollisionColor(new Color(1f, 0.62f, 0.05f), 0);
         public static readonly CollisionColor Blue = new CollisionColor(new Color(0.05f, 0.66f, 1f), 1);
-        public static readonly CollisionColor Purple = new CollisionColor(new Color(1f, 0.14f, .76f), 2);
+        public static readonly CollisionColor Pink = new CollisionColor(new Color(1f, 0.14f, .76f), 2);
         public static readonly CollisionColor Green = new CollisionColor(new Color(0.25f, 0.81f, 0.41f), 3);
 
         public readonly Color color;
@@ -25,7 +25,7 @@ namespace Common {
 
 
         public static Dictionary<int, CollisionColor> byInt = new Dictionary<int, CollisionColor>
-            {{0, Orange}, {1, Blue}, {2, Purple}, {3, Green}};
+            {{0, Orange}, {1, Blue}, {2, Pink}, {3, Green}};
 
         public static int operator -(CollisionColor a, CollisionColor b) => a.order - b.order;
 

@@ -1,81 +1,98 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using DefaultNamespace;
 using Player;
 using UnityEngine;
-using UnityEngine.Events;
+using UnityEngine.Advertisements;
 
-public class GameController : MonoBehaviour {
-    private static GameController instance;
-
-    [SerializeField] private MenuHandler menuHandler;
-    [SerializeField] private PlayerController playerController;
-    [SerializeField] private ScoreLabel scoreLabel;
-    [SerializeField] private EnemySpawner enemySpawner;
-
-    private PlayerCollisionHandler collisionHandler;
-    private PlayerAutoController autoController;
-    private PlayerInputHandler inputHandler;
+public class GameController : SingletonBehaviour<GameController>, IUnityAdsListener {
+    [SerializeField] private List<DisplayedAnimationToggle> objectToHide = new List<DisplayedAnimationToggle>();
+    [SerializeField] private float secondsBeforeAdd = 15f;
 
     private bool simulation = true;
+    private float lastAdd = -1f;
 
-    private void Awake() {
-        autoController = playerController.GetComponent<PlayerAutoController>();
-        inputHandler = playerController.GetComponent<PlayerInputHandler>();
-        collisionHandler = playerController.GetComponent<PlayerCollisionHandler>();
+    protected override void Awake() {
+        base.Awake();
 
-        collisionHandler.OnCollided += OnCollided;
-        collisionHandler.OnPassed += OnPassed;
+        PlayerCollisionHandler.OnCollided += OnCollided;
+        PlayerCollisionHandler.OnPassed += OnPassed;
 
         instance = this;
     }
 
     private void Start() {
-        instance.simulation = true;
-        instance.inputHandler.enabled = false;
-        instance.autoController.enabled = true;
-        instance.scoreLabel.DisplayHighscore = true;
-        instance.playerController.ResetRotation();
+        PlayerInputHandler.Enabled = false;
+        // instance.simulation = true;
+        // instance.inputHandler.enabled = false;
+        // instance.autoController.enabled = true;
+        ScoreLabel.DisplayHighscore = true;
+        // instance.playerController.ResetRotation();
+        Advertisement.AddListener(this);
     }
 
+    private void Update() {
+        // Will react on taps and mouse buttons
+        if (Input.GetMouseButtonDown(0)) OnGameStartedOrResumed();
+    }
 
-    public static bool DeathScreen {
-        get => instance.simulation;
+    private bool GameComponentsEnabled {
         set {
-            instance.simulation = value;
-            instance.inputHandler.enabled = !value;
-            instance.autoController.enabled = value;
-            
-            if (value) instance.menuHandler.Show();
-            else instance.menuHandler.Hide();
-
-            instance.scoreLabel.DisplayHighscore = value;
-
-            // When in game and playing
-            if (!value) instance.scoreLabel.Score = 0;
-
-            // Destroy all enemies, reset player and spawner
-            foreach (var enemy in FindObjectsOfType<Enemy>()) Destroy(enemy.gameObject);
-
-            if (!value) {
-                instance.playerController.ResetRotation();
-                instance.enemySpawner.Restart(); 
-            }
-
-            instance.collisionHandler.Dead = value;
-            instance.enemySpawner.enabled = !value;
+            EnemySpawner.Enabled = value;
+            PlayerInputHandler.Enabled = value;
         }
     }
 
-    private void OnPassed(Enemy enemy) {
-        Destroy(enemy.gameObject);
+    private bool MenuComponentsEnabled {
+        set {
+            enabled = value;
+            foreach (var toggle in objectToHide) toggle.Displayed = value;
+        }
+    }
 
-        if (!simulation) scoreLabel.Score++;
+    private bool ComponentsEnabled {
+        set {
+            GameComponentsEnabled = value;
+            MenuComponentsEnabled = !value;
+        }
+    }
+
+    private void OnGameStartedOrResumed() {
+        ComponentsEnabled = true;
+
+        // Reset components
+        EnemySpawner.Restart();
+        PlayerController.ResetRotation();
+    }
+
+    private void OnGameEnded() {
+        ComponentsEnabled = false;
+        
+        // Destroy all currently spawned enemies and stop spawning new ones 
+        foreach (var enemy in FindObjectsOfType<Enemy>()) {
+            enemy.SpawnParticles();
+            Destroy(enemy.gameObject);
+        }
+
+        // Show ad, if time elapsed since last ad
+        if (lastAdd < 0) lastAdd = Time.time;
+        else if (Time.time > lastAdd + secondsBeforeAdd) Advertisement.Show();
+    }
+
+    private void OnPassed(Enemy enemy) {
+        if (!simulation) ScoreLabel.Score++;
     }
 
     private void OnCollided(Enemy enemy) {
-        Destroy(enemy.gameObject);
+        OnGameEnded();
+    }
 
-        DeathScreen = true;
+    public void OnUnityAdsReady(string placementId) { }
+
+    public void OnUnityAdsDidError(string message) => Debug.LogError(message);
+
+    public void OnUnityAdsDidStart(string placementId) { }
+
+    public void OnUnityAdsDidFinish(string placementId, ShowResult showResult) {
+        lastAdd = Time.time;
     }
 }
