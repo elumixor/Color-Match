@@ -22,15 +22,17 @@ namespace Player {
         }
 
         public static void RotateRight() {
-            instance.Rotate(90f);    
+            instance.Rotate(90f);
         }
 
-        public static void ResetRotation() {
+        public static void ResetPlayer() {
             instance.rotating = false;
             instance.rotation = instance.CurrentAngle = instance.endAngle = instance.initialRotation;
+            instance.animator.SetBool(DeadID, false); 
         }
 
         [SerializeField, Range(10e-5f, 10f)] private float rotationTime = 0.1f;
+        private static readonly int DeadID = Animator.StringToHash("Dead");
 
         private float delta;
         private float startTime;
@@ -39,6 +41,7 @@ namespace Player {
         private bool rotating;
         private float rotation;
         private float initialRotation;
+        private Animator animator;
 
         private float CurrentAngle {
             get => transform.localRotation.eulerAngles.y;
@@ -52,6 +55,12 @@ namespace Player {
             base.Awake();
             initialRotation = CurrentAngle;
             endAngle = rotation = initialRotation;
+            animator = GetComponent<Animator>();
+            animator.SetBool(DeadID, false);
+        }
+
+        private void Start() {
+            PlayerCollisionHandler.OnCollided += delegate { animator.SetBool(DeadID, true); };
         }
 
 

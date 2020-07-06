@@ -6,6 +6,7 @@ using UnityEngine.Advertisements;
 
 public class GameController : SingletonBehaviour<GameController>, IUnityAdsListener {
     [SerializeField] private List<DisplayedAnimationToggle> objectToHide = new List<DisplayedAnimationToggle>();
+
     [SerializeField] private float secondsBeforeAdd = 15f;
 
     private bool simulation = true;
@@ -14,19 +15,14 @@ public class GameController : SingletonBehaviour<GameController>, IUnityAdsListe
     protected override void Awake() {
         base.Awake();
 
-        PlayerCollisionHandler.OnCollided += OnCollided;
-        PlayerCollisionHandler.OnPassed += OnPassed;
+        PlayerCollisionHandler.OnCollided += delegate { OnGameEnded(); };
+        PlayerCollisionHandler.OnPassed += delegate { ScoreLabel.Score++; };
 
         instance = this;
     }
 
     private void Start() {
-        PlayerInputHandler.Enabled = false;
-        // instance.simulation = true;
-        // instance.inputHandler.enabled = false;
-        // instance.autoController.enabled = true;
-        ScoreLabel.DisplayHighscore = true;
-        // instance.playerController.ResetRotation();
+        GameComponentsEnabled = false;
         Advertisement.AddListener(this);
     }
 
@@ -57,16 +53,17 @@ public class GameController : SingletonBehaviour<GameController>, IUnityAdsListe
     }
 
     private void OnGameStartedOrResumed() {
+        ScoreLabel.Score = 0;
         ComponentsEnabled = true;
 
         // Reset components
         EnemySpawner.Restart();
-        PlayerController.ResetRotation();
+        PlayerController.ResetPlayer();
     }
 
     private void OnGameEnded() {
         ComponentsEnabled = false;
-        
+
         // Destroy all currently spawned enemies and stop spawning new ones 
         foreach (var enemy in FindObjectsOfType<Enemy>()) {
             enemy.SpawnParticles();
@@ -78,21 +75,14 @@ public class GameController : SingletonBehaviour<GameController>, IUnityAdsListe
         else if (Time.time > lastAdd + secondsBeforeAdd) Advertisement.Show();
     }
 
-    private void OnPassed(Enemy enemy) {
-        if (!simulation) ScoreLabel.Score++;
-    }
-
-    private void OnCollided(Enemy enemy) {
-        OnGameEnded();
-    }
-
     public void OnUnityAdsReady(string placementId) { }
 
     public void OnUnityAdsDidError(string message) => Debug.LogError(message);
 
-    public void OnUnityAdsDidStart(string placementId) { }
+    public void OnUnityAdsDidStart(string placementId) => Enabled = false;
 
     public void OnUnityAdsDidFinish(string placementId, ShowResult showResult) {
         lastAdd = Time.time;
+        Enabled = true;
     }
 }
