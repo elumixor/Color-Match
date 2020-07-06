@@ -32,7 +32,7 @@ Transform:
   m_LocalRotation: {x: 0.000000059604645, y: -0.000000059604645, z: 0.000000059604645,
     w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.24966519, y: 0.24966507, z: 0.24966507}
+  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -133,10 +133,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb08aa1fb6e9828409181dea2f2a01f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fadeInTime: 0.25
   deathParticleSystem: {fileID: 3705508913994278382, guid: 4f434f46503ffde4590fe59a2f6d3474,
     type: 3}
-  velocity: 50
 --- !u!95 &300424975560760290
 Animator:
   serializedVersion: 3
