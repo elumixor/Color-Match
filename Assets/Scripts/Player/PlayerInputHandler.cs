@@ -12,7 +12,7 @@ namespace Player {
 #else
             if (Input.touchCount > 0) {
                 var touch = Input.GetTouch(0);
-                if (touch.phase == TouchPhase.Began) ReactToInput(Input.GetTouch(0).position.x)
+                if (touch.phase == TouchPhase.Began) ReactToInput(Input.GetTouch(0).position.x);
             }
 #endif
         }
