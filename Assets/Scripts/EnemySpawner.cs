@@ -4,38 +4,27 @@ using System.Collections.Generic;
 using System.Configuration;
 using Common;
 using DefaultNamespace;
+using Player;
 using UnityEngine;
 
 public class EnemySpawner : SingletonBehaviour<EnemySpawner> {
     [SerializeField] private Enemy enemyPrefab;
-    [SerializeField, Range(1e-3f, 2f)] private float spawnFrequency = 1f;
-    [SerializeField, Range(1f, 500f)] private float startVelocity = 50f;
-    [SerializeField, Range(0.1f, 1f)] private float increaseFactor = 0.9999f;
 
-    private float frequency;
-    private float lastSpawnTime;
-    
-    protected override void Awake() {
-        base.Awake();
-        frequency = spawnFrequency;
-    }
+    [SerializeField] private SpeedReactor frequency;
+    [SerializeField] private SpeedReactor startVelocity;
+
+    private float nextSpawnTime;
 
     private void Start() {
-        lastSpawnTime = Time.time - spawnFrequency;
+        nextSpawnTime = Time.time;
     }
 
     private void Update() {
-        frequency *= increaseFactor;
-        if (lastSpawnTime + frequency <= Time.time) {
+        if (Time.time > nextSpawnTime) {
             Spawn();
-            lastSpawnTime = Time.time;
+            nextSpawnTime = Time.time + frequency;
         }
     }
 
     private void Spawn() => Enemy.Spawn(enemyPrefab, transform, CollisionColor.Random, startVelocity);
-
-    public static void Restart() {
-        instance.lastSpawnTime = Time.time - instance.spawnFrequency;
-        instance.frequency = instance.spawnFrequency;
-    }
 }

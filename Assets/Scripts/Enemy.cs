@@ -5,6 +5,7 @@ using Random = UnityEngine.Random;
 
 public class Enemy : MonoBehaviour {
     [SerializeField] private ParticleSystem deathParticleSystem;
+    
     [SerializeField] private float minTimeToSpawnParticles = .5f;
     
     public CollisionColor collisionColor;
@@ -38,6 +39,9 @@ public class Enemy : MonoBehaviour {
     public static Enemy Spawn(Enemy enemyPrefab, Transform parent, CollisionColor collisionColor, float startVelocity) {
         var instance = Instantiate(enemyPrefab, parent);
         instance.GetComponent<Renderer>().material.SetColor(ColorShader, collisionColor.color);
+        var main = instance.GetComponent<ParticleSystem>().main;
+        main.startColor = collisionColor.color;
+        
         instance.collisionColor = collisionColor;
 
         var rb = instance.GetComponent<Rigidbody2D>();

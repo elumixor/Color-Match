@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections;
-using Common;
+﻿using Common;
 using DefaultNamespace;
-using UnityEditor.Recorder.Input;
 using UnityEngine;
 
 namespace Player {
@@ -28,10 +25,11 @@ namespace Player {
         public static void ResetPlayer() {
             instance.rotating = false;
             instance.rotation = instance.CurrentAngle = instance.endAngle = instance.initialRotation;
-            instance.animator.SetBool(DeadID, false); 
+            instance.animator.SetBool(DeadID, false);
         }
 
-        [SerializeField, Range(10e-5f, 10f)] private float rotationTime = 0.1f;
+        [SerializeField] private SpeedReactor rotationTime;
+
         private static readonly int DeadID = Animator.StringToHash("Dead");
 
         private float delta;
@@ -65,9 +63,10 @@ namespace Player {
 
 
         private void Rotate(float angle) {
+            var r = rotationTime;
             startTime = Time.time;
-            endTime = Time.time + rotationTime;
-            delta = (endAngle - rotation + angle) / rotationTime;
+            endTime = Time.time + r;
+            delta = (endAngle - rotation + angle) / r;
             endAngle += angle;
             rotating = true;
         }

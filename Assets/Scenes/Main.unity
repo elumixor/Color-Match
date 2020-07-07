@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 1
+  m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -442,9 +442,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 8637918902473686713, guid: b4e720a2ea9427b42884b1e562a8b71f,
     type: 3}
-  spawnFrequency: 1
-  startVelocity: 50
-  increaseFactor: 0.9999
+  frequency:
+    offset: 1.5
+    factor: -1
+  startVelocity:
+    offset: 30
+    factor: 40
 --- !u!224 &379561632 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1437065695196067804, guid: 00df50d0d02e00e42aaa6e9f143b3b44,
@@ -461,8 +464,9 @@ GameObject:
   m_Component:
   - component: {fileID: 446226516}
   - component: {fileID: 446226517}
+  - component: {fileID: 446226518}
   m_Layer: 0
-  m_Name: Game Controller
+  m_Name: Game and Speed Controller
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -500,6 +504,43 @@ MonoBehaviour:
   - {fileID: 2128827391}
   - {fileID: 1372164588}
   secondsBeforeAdd: 15
+--- !u!114 &446226518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 446226515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35bd0146059147f5bd0b7891b5e26a26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speedCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 136
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: -0
+      outSlope: -0
+      tangentMode: 0
+      weightedMode: 1
+      inWeight: 0.9359673
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  curveLength: 100
 --- !u!1 &480350227
 GameObject:
   m_ObjectHideFlags: 0
@@ -587,7 +628,7 @@ MonoBehaviour:
   m_outlineColor:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontSize: 126.8
+  m_fontSize: 126.6
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -2067,7 +2108,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3daeae7377094a0297ab990b64d14e8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationTime: 0.1
+  rotationTime:
+    offset: 0.25
+    factor: -0.25
 --- !u!50 &2134446212
 Rigidbody2D:
   serializedVersion: 4

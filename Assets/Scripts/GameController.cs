@@ -6,11 +6,11 @@ using UnityEngine.Advertisements;
 
 public class GameController : SingletonBehaviour<GameController>, IUnityAdsListener {
     [SerializeField] private List<DisplayedAnimationToggle> objectToHide = new List<DisplayedAnimationToggle>();
-
     [SerializeField] private float secondsBeforeAdd = 15f;
 
-    private bool simulation = true;
-    private float lastAdd = -1f;
+    // Track time and conditionally show ads
+    private float startTime;
+    private float elapsed;
 
     protected override void Awake() {
         base.Awake();
@@ -35,6 +35,7 @@ public class GameController : SingletonBehaviour<GameController>, IUnityAdsListe
         set {
             EnemySpawner.Enabled = value;
             PlayerInputHandler.Enabled = value;
+            SpeedIncreaser.Enabled = value;
         }
     }
 
@@ -53,12 +54,15 @@ public class GameController : SingletonBehaviour<GameController>, IUnityAdsListe
     }
 
     private void OnGameStartedOrResumed() {
+        // Track time playing
+        startTime = Time.time;
+
         ScoreLabel.Score = 0;
         ComponentsEnabled = true;
 
-        // Reset components
-        EnemySpawner.Restart();
+        // Restart game components components
         PlayerController.ResetPlayer();
+        SpeedIncreaser.Restart();
     }
 
     private void OnGameEnded() {
@@ -70,19 +74,20 @@ public class GameController : SingletonBehaviour<GameController>, IUnityAdsListe
             Destroy(enemy.gameObject);
         }
 
-        // Show ad, if time elapsed since last ad
-        if (lastAdd < 0) lastAdd = Time.time;
-        else if (Time.time > lastAdd + secondsBeforeAdd) Advertisement.Show();
+        // If playing for long enough, then show advertisement
+        elapsed += Time.time - startTime;
+        if (elapsed > secondsBeforeAdd) {
+            Advertisement.Show();
+            Enabled = false;
+            elapsed = 0f;
+        }
     }
 
     public void OnUnityAdsReady(string placementId) { }
 
     public void OnUnityAdsDidError(string message) => Debug.LogError(message);
 
-    public void OnUnityAdsDidStart(string placementId) => Enabled = false;
+    public void OnUnityAdsDidStart(string placementId) { }
 
-    public void OnUnityAdsDidFinish(string placementId, ShowResult showResult) {
-        lastAdd = Time.time;
-        Enabled = true;
-    }
+    public void OnUnityAdsDidFinish(string placementId, ShowResult showResult) => Enabled = true;
 }
