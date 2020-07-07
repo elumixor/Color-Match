@@ -726,10 +726,10 @@ PlayerSettings:
     m_VersionCode: 1
     m_VersionName: 
   apiCompatibilityLevel: 6
-  cloudProjectId: d703085e-f8eb-46a7-8a94-890f225edfb0
+  cloudProjectId: 
   framebufferDepthMemorylessMode: 0
-  projectName: Color Match
-  organizationId: velumi
+  projectName: 
+  organizationId: 
   cloudEnabled: 0
   enableNativePlatformBackendsForNewInputSystem: 0
   disableOldInputManagerSupport: 0

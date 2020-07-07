@@ -5,14 +5,25 @@ using Random = UnityEngine.Random;
 
 public class Enemy : MonoBehaviour {
     [SerializeField] private ParticleSystem deathParticleSystem;
-    
     [SerializeField] private float minTimeToSpawnParticles = .5f;
     
     public CollisionColor collisionColor;
-
     private float velocity;
 
     private static readonly int ColorShader = Shader.PropertyToID("_Color");
+
+    private float spawnTime;
+
+    private void Start() {
+        spawnTime = Time.time;
+    }
+
+    private void OnCollisionEnter2D(Collision2D _) {
+        CameraShaker.Shake();
+        VolumeAnimator.Animate();
+        SpawnParticles();
+        Destroy(gameObject);
+    }
 
     public void SpawnParticles() {
         if (Time.time - spawnTime < minTimeToSpawnParticles) return;
@@ -21,25 +32,12 @@ public class Enemy : MonoBehaviour {
         particlesMain.startColor = new ParticleSystem.MinMaxGradient(collisionColor.color);
     }
 
-    private void OnCollisionEnter2D(Collision2D _) {
-        CameraShaker.Shake();
-
-        VolumeAnimator.Animate();
-        SpawnParticles();
-
-        Destroy(gameObject);
-    }
-
-    private float spawnTime;
-
-    private void Start() {
-        spawnTime = Time.time;
-    }
-
     public static Enemy Spawn(Enemy enemyPrefab, Transform parent, CollisionColor collisionColor, float startVelocity) {
         var instance = Instantiate(enemyPrefab, parent);
         instance.GetComponent<Renderer>().material.SetColor(ColorShader, collisionColor.color);
-        var main = instance.GetComponent<ParticleSystem>().main;
+        var ps = instance.GetComponent<ParticleSystem>();
+
+        var main = ps.main;
         main.startColor = collisionColor.color;
         
         instance.collisionColor = collisionColor;

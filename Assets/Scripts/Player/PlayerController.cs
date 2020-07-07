@@ -1,5 +1,4 @@
 ﻿using Common;
-using DefaultNamespace;
 using UnityEngine;
 
 namespace Player {
