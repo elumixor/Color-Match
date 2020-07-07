@@ -1,16 +1,17 @@
 ﻿using System.Collections.Generic;
-using DefaultNamespace;
 using Player;
 using UnityEngine;
 using UnityEngine.Advertisements;
 
 public class GameController : SingletonBehaviour<GameController>, IUnityAdsListener {
     [SerializeField] private List<DisplayedAnimationToggle> objectToHide = new List<DisplayedAnimationToggle>();
-    [SerializeField] private float secondsBeforeAdd = 15f;
+    [SerializeField] private float secondsBeforeAd = 30f;
+    [SerializeField] private int timesLostBeforeAd = 2;
 
     // Track time and conditionally show ads
     private float startTime;
     private float elapsed;
+    private int timesLost;
 
     protected override void Awake() {
         base.Awake();
@@ -42,6 +43,7 @@ public class GameController : SingletonBehaviour<GameController>, IUnityAdsListe
     private bool MenuComponentsEnabled {
         set {
             enabled = value;
+            SoundManager.Lowpass = !value;
             foreach (var toggle in objectToHide) toggle.Displayed = value;
         }
     }
@@ -63,6 +65,7 @@ public class GameController : SingletonBehaviour<GameController>, IUnityAdsListe
         // Restart game components components
         PlayerController.ResetPlayer();
         SpeedIncreaser.Restart();
+        PlayerCollisionHandler.Restart();
     }
 
     private void OnGameEnded() {
@@ -76,10 +79,13 @@ public class GameController : SingletonBehaviour<GameController>, IUnityAdsListe
 
         // If playing for long enough, then show advertisement
         elapsed += Time.time - startTime;
-        if (elapsed > secondsBeforeAdd) {
+        timesLost++;
+        
+        if (elapsed > secondsBeforeAd && timesLost >= timesLostBeforeAd) {
             Advertisement.Show();
             Enabled = false;
             elapsed = 0f;
+            timesLost = 0;
         }
     }
 
@@ -87,7 +93,10 @@ public class GameController : SingletonBehaviour<GameController>, IUnityAdsListe
 
     public void OnUnityAdsDidError(string message) => Debug.LogError(message);
 
-    public void OnUnityAdsDidStart(string placementId) { }
+    public void OnUnityAdsDidStart(string placementId) => SoundManager.Mute();
 
-    public void OnUnityAdsDidFinish(string placementId, ShowResult showResult) => Enabled = true;
+    public void OnUnityAdsDidFinish(string placementId, ShowResult showResult) {
+        Enabled = true;
+        SoundManager.Lowpass = false; // Unmute 
+    }
 }

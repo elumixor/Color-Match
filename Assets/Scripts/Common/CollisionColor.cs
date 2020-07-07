@@ -10,6 +10,8 @@ namespace Common {
         public static readonly CollisionColor Pink = new CollisionColor(new Color(1f, 0.14f, .76f), 2);
         public static readonly CollisionColor Green = new CollisionColor(new Color(0.25f, 0.81f, 0.41f), 3);
 
+        public const int Count = 4;
+        
         public readonly Color color;
         public readonly int order;
 

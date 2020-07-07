@@ -138,6 +138,12 @@ MonoBehaviour:
   deathParticleSystem: {fileID: 3705508913994278382, guid: 4f434f46503ffde4590fe59a2f6d3474,
     type: 3}
   minTimeToSpawnParticles: 0.5
+  collisionSound:
+    name: 
+    clip: {fileID: 8300000, guid: cfe405baba3d15940becaad8f329598f, type: 3}
+    mixer: {fileID: 0}
+    volume: 1
+    pitch: 0
 --- !u!95 &300424975560760290
 Animator:
   serializedVersion: 3
@@ -240,7 +246,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.25
+      scalar: 1
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -293,7 +299,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 5
+      scalar: 10
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -410,7 +416,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 3
       scalar: 4
-      minScalar: 2
+      minScalar: 1
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -784,12 +790,12 @@ ParticleSystem:
   ShapeModule:
     serializedVersion: 6
     enabled: 1
-    type: 17
+    type: 10
     angle: 25
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
     radiusThickness: 1
-    donutRadius: 1
+    donutRadius: 30.3
     m_Position: {x: 0, y: 0, z: 0}
     m_Rotation: {x: 90, y: 90, z: 0}
     m_Scale: {x: 1, y: 1, z: 1}
@@ -871,7 +877,7 @@ ParticleSystem:
     sphericalDirectionAmount: 0
     randomPositionAmount: 0
     radius:
-      value: 1
+      value: 29.9
       mode: 0
       spread: 0
       speed:
@@ -1675,7 +1681,7 @@ ParticleSystem:
     y:
       serializedVersion: 2
       minMaxState: 0
-      scalar: -25
+      scalar: 0
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -2099,7 +2105,7 @@ ParticleSystem:
     radial:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 125
+      scalar: 1
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -2424,11 +2430,11 @@ ParticleSystem:
     randomizePerFrame: 0
   ExternalForcesModule:
     serializedVersion: 2
-    enabled: 0
+    enabled: 1
     multiplierCurve:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 1
+      scalar: 2
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -4011,7 +4017,7 @@ ParticleSystem:
         m_RotationOrder: 4
     maxLights: 20
   TrailModule:
-    enabled: 1
+    enabled: 0
     mode: 0
     ratio: 1
     lifetime:

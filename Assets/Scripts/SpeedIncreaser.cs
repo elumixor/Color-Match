@@ -1,5 +1,4 @@
 ﻿using System;
-using DefaultNamespace;
 using UnityEngine;
 
 public class SpeedIncreaser : SingletonBehaviour<SpeedIncreaser> {
@@ -25,7 +24,6 @@ public class SpeedIncreaser : SingletonBehaviour<SpeedIncreaser> {
 
     private void Update() {
         elapsed += Time.deltaTime;
-        Debug.Log(speed);
         UpdateSpeed();
     }
 }

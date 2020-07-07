@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using Common;
-using DefaultNamespace;
 using Player;
 using UnityEngine;
+using Random = System.Random;
 
 public class EnemySpawner : SingletonBehaviour<EnemySpawner> {
     [SerializeField] private Enemy enemyPrefab;
@@ -14,9 +14,11 @@ public class EnemySpawner : SingletonBehaviour<EnemySpawner> {
     [SerializeField] private SpeedReactor startVelocity;
 
     private float nextSpawnTime;
+    private CollisionColor lastSpawnColor;
 
     private void Start() {
         nextSpawnTime = Time.time;
+        lastSpawnColor = CollisionColor.Random;
     }
 
     private void Update() {
@@ -26,5 +28,11 @@ public class EnemySpawner : SingletonBehaviour<EnemySpawner> {
         }
     }
 
-    private void Spawn() => Enemy.Spawn(enemyPrefab, transform, CollisionColor.Random, startVelocity);
+    private void Spawn() {
+        var c = CollisionColor.Random;
+        if (c.order == lastSpawnColor.order) c = CollisionColor.byInt[(c.order + 1) % CollisionColor.Count];
+
+        lastSpawnColor = c;
+        Enemy.Spawn(enemyPrefab, transform, c, startVelocity);
+    }
 }
