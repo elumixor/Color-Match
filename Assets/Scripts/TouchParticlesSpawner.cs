@@ -13,7 +13,6 @@ public class TouchParticlesSpawner : SingletonBehaviour<TouchParticlesSpawner> {
     }
 
     private void Update() {
-#if UNITY_EDITOR || UNITY_WEBGL
         if (Input.GetMouseButtonDown(0)) {
             var isRight = Input.mousePosition.x > Screen.width * 0.5f;
             var worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -27,7 +26,5 @@ public class TouchParticlesSpawner : SingletonBehaviour<TouchParticlesSpawner> {
             main.startColor = color.color;
             audioSource.Play();
         }
-#else
-#endif
     }
 }
