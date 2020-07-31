@@ -2,13 +2,14 @@
 using UnityEngine;
 
 public class SingletonBehaviour<T> : MonoBehaviour where T : MonoBehaviour {
-    public static T instance;
+    public static T Instance { get; private set; }
+
     protected virtual void Awake() {
-        instance = GetComponent<T>();
+        Instance = GetComponent<T>();
     }
 
     public static bool Enabled {
-        get => instance.enabled;
-        set => instance.enabled = value;
+        get => Instance.enabled;
+        set => Instance.enabled = value;
     }
 }

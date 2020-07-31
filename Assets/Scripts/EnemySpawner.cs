@@ -4,14 +4,18 @@ using System.Collections.Generic;
 using System.Configuration;
 using Common;
 using Player;
+using UnityEditor;
 using UnityEngine;
-using Random = System.Random;
+using Random = UnityEngine.Random;
 
 public class EnemySpawner : SingletonBehaviour<EnemySpawner> {
     [SerializeField] private Enemy enemyPrefab;
 
     [SerializeField] private SpeedReactor frequency;
     [SerializeField] private SpeedReactor startVelocity;
+
+    [Range(0, 1), SerializeField] private float doubleTapProbability = .25f;
+
 
     private float nextSpawnTime;
     private CollisionColor lastSpawnColor;
@@ -29,10 +33,10 @@ public class EnemySpawner : SingletonBehaviour<EnemySpawner> {
     }
 
     private void Spawn() {
-        var c = CollisionColor.Random;
-        if (c.order == lastSpawnColor.order) c = CollisionColor.byInt[(c.order + 1) % CollisionColor.Count];
-
-        lastSpawnColor = c;
-        Enemy.Spawn(enemyPrefab, transform, c, startVelocity);
+        var pc = PlayerController.Color.order;
+        var next = CollisionColor.ByInt[
+            (CollisionColor.Count + pc + (Random.value < doubleTapProbability ? 2 : Random.value > .5f ? 1 : -1)) % CollisionColor.Count];
+        lastSpawnColor = next;
+        Enemy.Spawn(enemyPrefab, transform, next, startVelocity);
     }
 }

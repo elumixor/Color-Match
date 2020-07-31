@@ -1,29 +1,43 @@
 ﻿using System.Collections.Generic;
 using Player;
+using TMPro;
+using UI;
 using UnityEngine;
 using UnityEngine.Advertisements;
 
 public class GameController : SingletonBehaviour<GameController>, IUnityAdsListener {
     [SerializeField] private List<DisplayedAnimationToggle> objectToHide = new List<DisplayedAnimationToggle>();
-    [SerializeField] private float secondsBeforeAd = 30f;
-    [SerializeField] private int timesLostBeforeAd = 2;
+    [SerializeField] private float adSecondsMultiplier = 1;
+    [SerializeField] private float adTimesLostMultiplier = 20;
+
+    [SerializeField] private ScoreLabel scoreLabel;
+    [SerializeField] private ScoreLabel highscoreLabel;
+
+    [SerializeField] private DisplayedAnimationToggle settingsAnimationToggle;
+    
+    private int score;
+    private int highscore;
 
     // Track time and conditionally show ads
     private float startTime;
-    private float elapsed;
-    private int timesLost;
+
+    private float currentAdPoints;
+    private static readonly int FocusedID = Animator.StringToHash("Focused");
 
     protected override void Awake() {
         base.Awake();
 
         PlayerCollisionHandler.OnCollided += delegate { OnGameEnded(); };
-        PlayerCollisionHandler.OnPassed += delegate { ScoreLabel.Score++; };
-
-        instance = this;
+        PlayerCollisionHandler.OnPassed += delegate { OnPassed(); };
     }
 
     private void Start() {
         GameComponentsEnabled = false;
+        highscoreLabel.Score = highscore = PlayerPrefs.GetInt("highscore", 0);
+        if (highscore == 0) highscoreLabel.DisplayStars = highscoreLabel.Displayed = false;
+
+        scoreLabel.DisplayStars = scoreLabel.Displayed = false;
+        
         Advertisement.AddListener(this);
     }
 
@@ -32,10 +46,11 @@ public class GameController : SingletonBehaviour<GameController>, IUnityAdsListe
         if (Input.GetMouseButtonDown(0)) OnGameStartedOrResumed();
     }
 
-    private bool GameComponentsEnabled {
+    private static bool GameComponentsEnabled {
         set {
             EnemySpawner.Enabled = value;
             PlayerInputHandler.Enabled = value;
+            TouchParticlesSpawner.Enabled = value;
             SpeedIncreaser.Enabled = value;
         }
     }
@@ -59,8 +74,11 @@ public class GameController : SingletonBehaviour<GameController>, IUnityAdsListe
         // Track time playing
         startTime = Time.time;
 
-        ScoreLabel.Score = 0;
+        scoreLabel.Score = score = 0;
         ComponentsEnabled = true;
+        scoreLabel.Displayed = true;
+        scoreLabel.DisplayStars = false;
+        scoreLabel.GetComponent<Animator>().SetBool(FocusedID, false);
 
         // Restart game components components
         PlayerController.ResetPlayer();
@@ -68,8 +86,25 @@ public class GameController : SingletonBehaviour<GameController>, IUnityAdsListe
         PlayerCollisionHandler.Restart();
     }
 
+    private void OnPassed() {
+        score++;
+
+        scoreLabel.Score = score;
+
+        if (score > highscore) {
+            highscore = score;
+            highscoreLabel.Score = score;
+            scoreLabel.DisplayStars = highscoreLabel.DisplayStars = highscoreLabel.Displayed = true;
+            PlayerPrefs.SetInt("highscore", score);
+        }
+    }
+
+    public static float Elapsed => Mathf.Max(0, Time.time - Instance.startTime);
+
     private void OnGameEnded() {
         ComponentsEnabled = false;
+        scoreLabel.GetComponent<Animator>().SetBool(FocusedID, true);
+
 
         // Destroy all currently spawned enemies and stop spawning new ones 
         foreach (var enemy in FindObjectsOfType<Enemy>()) {
@@ -78,17 +113,28 @@ public class GameController : SingletonBehaviour<GameController>, IUnityAdsListe
         }
 
         // If playing for long enough, then show advertisement
-        elapsed += Time.time - startTime;
-        timesLost++;
-        
-        if (elapsed > secondsBeforeAd && timesLost >= timesLostBeforeAd) {
+        currentAdPoints += Elapsed * adSecondsMultiplier + adTimesLostMultiplier;
+
+
+        if (currentAdPoints > 1f) {
             Advertisement.Show();
             Enabled = false;
-            elapsed = 0f;
-            timesLost = 0;
+            currentAdPoints = 0f;
         }
     }
 
+    public void ShowSettings() {
+        settingsAnimationToggle.Displayed = true;
+        GameComponentsEnabled = false;
+        Time.timeScale = 0f;
+    }
+
+    public void HideSettings() {
+        settingsAnimationToggle.Displayed = false;
+        GameComponentsEnabled = true;
+        Time.timeScale = 1f;
+    }
+    
     public void OnUnityAdsReady(string placementId) { }
 
     public void OnUnityAdsDidError(string message) => Debug.LogError(message);

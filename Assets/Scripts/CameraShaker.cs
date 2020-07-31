@@ -8,7 +8,7 @@ public class CameraShaker : SingletonBehaviour<CameraShaker> {
     [SerializeField] private float strength;
     [SerializeField] private AnimationCurve curve;
 
-    public static void Shake() => instance.StartCoroutine(instance.ShakeCoroutine());
+    public static void Shake() => Instance.StartCoroutine(Instance.ShakeCoroutine());
 
     private IEnumerator ShakeCoroutine() {
         var pos = transform.localPosition;

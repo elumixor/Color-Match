@@ -20,13 +20,13 @@ namespace Common {
             this.order = order;
         }
 
-        public CollisionColor Next => byInt[(order + 1) % 4];
-        public CollisionColor Previous => byInt[(4 + order - 1) % 4];
-        public CollisionColor Flip => byInt[(order + 2) % 4];
-        public static CollisionColor Random => byInt[UnityEngine.Random.Range(0, 4)];
+        public CollisionColor Next => ByInt[(order + 1) % 4];
+        public CollisionColor Previous => ByInt[(4 + order - 1) % 4];
+        public CollisionColor Flip => ByInt[(order + 2) % 4];
+        public static CollisionColor Random => ByInt[UnityEngine.Random.Range(0, 4)];
 
 
-        public static Dictionary<int, CollisionColor> byInt = new Dictionary<int, CollisionColor>
+        public static readonly Dictionary<int, CollisionColor> ByInt = new Dictionary<int, CollisionColor>
             {{0, Orange}, {1, Blue}, {2, Pink}, {3, Green}};
 
         public static int operator -(CollisionColor a, CollisionColor b) => a.order - b.order;

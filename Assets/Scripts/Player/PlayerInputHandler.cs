@@ -17,11 +17,18 @@ namespace Player {
 #endif
         }
 
+        public bool Swap { get; set; }
+
         private void ReactToInput(float x) {
             var isRight = x >= Screen.width / 2f;
 
-            if (isRight) PlayerController.RotateLeft();
-            else PlayerController.RotateRight();
+            if (Swap) {
+                if (isRight) PlayerController.RotateRight();
+                else PlayerController.RotateLeft();
+            } else {
+                if (isRight) PlayerController.RotateLeft();
+                else PlayerController.RotateRight();
+            }
         }
     }
 }

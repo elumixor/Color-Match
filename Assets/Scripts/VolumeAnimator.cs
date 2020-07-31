@@ -9,7 +9,7 @@ public class VolumeAnimator : SingletonBehaviour<VolumeAnimator> {
     [SerializeField] private AnimationCurve curve;
     [SerializeField] private float duration;
 
-    public static void Animate() => instance.StartCoroutine(instance.Coroutine());
+    public static void Animate() => Instance.StartCoroutine(Instance.Coroutine());
 
     private IEnumerator Coroutine() {
         var elapsed = 0f;

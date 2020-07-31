@@ -1,30 +1,32 @@
-﻿using Common;
+﻿using System.Collections;
+using System.Collections.Generic;
+using Common;
 using UnityEngine;
 
 namespace Player {
     public class PlayerController : SingletonBehaviour<PlayerController> {
         public static CollisionColor Color {
             get {
-                var angle = instance.CurrentAngle;
-                return angle > 315f ? CollisionColor.Pink :
+                var angle = Instance.CurrentAngle;
+                return angle > 315f ? CollisionColor.Orange :
                     angle > 225f ? CollisionColor.Green :
-                    angle > 135f ? CollisionColor.Orange :
-                    angle > 45f ? CollisionColor.Blue : CollisionColor.Pink;
+                    angle > 135f ? CollisionColor.Pink :
+                    angle > 45f ? CollisionColor.Blue : CollisionColor.Orange;
             }
         }
 
         public static void RotateLeft() {
-            instance.Rotate(-90f);
+            Instance.Rotate(-90f);
         }
 
         public static void RotateRight() {
-            instance.Rotate(90f);
+            Instance.Rotate(90f);
         }
 
         public static void ResetPlayer() {
-            instance.rotating = false;
-            instance.rotation = instance.CurrentAngle = instance.endAngle = instance.initialRotation;
-            instance.animator.SetBool(DeadID, false);
+            Instance.rotating = false;
+            Instance.rotation = Instance.CurrentAngle = Instance.endAngle = Instance.initialRotation;
+            Instance.animator.SetBool(DeadID, false);
         }
 
         [SerializeField] private SpeedReactor rotationTime;
@@ -41,10 +43,10 @@ namespace Player {
         private Animator animator;
 
         private float CurrentAngle {
-            get => transform.localRotation.eulerAngles.y;
+            get => transform.localRotation.eulerAngles.z;
             set {
                 var angles = transform.localRotation.eulerAngles;
-                transform.localRotation = Quaternion.Euler(angles.x, value, angles.z);
+                transform.localRotation = Quaternion.Euler(angles.x, angles.y, value);
             }
         }
 

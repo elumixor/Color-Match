@@ -12,6 +12,8 @@ public class TouchParticlesSpawner : SingletonBehaviour<TouchParticlesSpawner> {
         audioSource = GetComponent<AudioSource>();
     }
 
+    public bool Swap { get; set; }
+
     private void Update() {
         if (Input.GetMouseButtonDown(0)) {
             var isRight = Input.mousePosition.x > Screen.width * 0.5f;
@@ -20,8 +22,8 @@ public class TouchParticlesSpawner : SingletonBehaviour<TouchParticlesSpawner> {
             var particles = Instantiate(system);
             particles.transform.position = worldPosition;
             var colorOrder = PlayerController.Color.order;
-            colorOrder = (CollisionColor.Count + colorOrder + (isRight ? 1 : -1)) % CollisionColor.Count;
-            var color = CollisionColor.byInt[colorOrder];
+            colorOrder = (CollisionColor.Count + colorOrder + (isRight ? 1 : -1)  * (Swap ? 1 : -1)) % CollisionColor.Count;
+            var color = CollisionColor.ByInt[colorOrder];
             var main = particles.main;
             main.startColor = color.color;
             audioSource.Play();

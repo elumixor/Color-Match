@@ -14,11 +14,11 @@ public class SpeedIncreaser : SingletonBehaviour<SpeedIncreaser> {
     }
 
     public static void Restart() {
-        instance.elapsed = 0f;
-        instance.UpdateSpeed();
+        Instance.elapsed = 0f;
+        Instance.UpdateSpeed();
     }
 
-    public static float Speed => instance.speed;
+    public static float Speed => Instance.speed;
 
     private void UpdateSpeed() => speed = speedCurve.Evaluate(Mathf.Clamp01(elapsed / curveLength));
 
