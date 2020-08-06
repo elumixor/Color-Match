@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Animations {
     public class TriggerChildDisplayed : StateMachineBehaviour {

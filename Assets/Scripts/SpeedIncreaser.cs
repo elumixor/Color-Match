@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SpeedIncreaser : SingletonBehaviour<SpeedIncreaser> {
     [SerializeField] private AnimationCurve speedCurve;

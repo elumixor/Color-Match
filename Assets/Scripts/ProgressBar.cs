@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using NaughtyAttributes;
 using UnityEngine;
 
@@ -22,6 +20,11 @@ public class ProgressBar : MonoBehaviour {
     private static readonly int ColorBottomID = Shader.PropertyToID("_ColorBottom");
     private static readonly int ColorTopID = Shader.PropertyToID("_ColorTop");
     private static readonly int AngleID = Shader.PropertyToID("_Angle");
+
+    private IEnumerator Start() {
+        yield return new WaitForEndOfFrame();
+        UpdateButton();
+    }
 
     [Button]
     public void UpdateButton() {
@@ -53,24 +56,15 @@ public class ProgressBar : MonoBehaviour {
         outer.GenerateMesh();
         inner.GenerateMesh();
         fill.GenerateMesh();
+    }
 
+    private void Update() {
         outer.GetComponent<Renderer>().sharedMaterial.color = outerColor;
         fill.GetComponent<Renderer>().sharedMaterial.color = fillColor;
 
         var innerMaterial = inner.GetComponent<Renderer>().sharedMaterial;
         innerMaterial.SetColor(ColorTopID, innerColorLeft);
         innerMaterial.SetColor(ColorBottomID, innerColorRight);
-
         innerMaterial.SetFloat(AngleID, 90);
     }
-
-#if UNITY_EDITOR
-    private void Update() {
-        UpdateButton();
-    }
-#else
-    private void Start() {
-        UpdateButton();
-    }
-#endif
 }

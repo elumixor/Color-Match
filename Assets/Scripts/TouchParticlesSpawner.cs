@@ -1,10 +1,11 @@
 ﻿using Common;
 using Player;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(AudioSource))]
 public class TouchParticlesSpawner : SingletonBehaviour<TouchParticlesSpawner> {
-    [SerializeField] private ParticleSystem system;
+    [SerializeField] private TouchParticle touchParticle;
 
     private AudioSource audioSource;
 
@@ -14,19 +15,14 @@ public class TouchParticlesSpawner : SingletonBehaviour<TouchParticlesSpawner> {
 
     public bool Swap { get; set; }
 
-    private void Update() {
-        if (Input.GetMouseButtonDown(0)) {
-            var isRight = Input.mousePosition.x > Screen.width * 0.5f;
-            var worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            worldPosition.z = 0;
-            var particles = Instantiate(system);
-            particles.transform.position = worldPosition;
-            var colorOrder = PlayerController.Color.order;
-            colorOrder = (CollisionColor.Count + colorOrder + (isRight ? 1 : -1)  * (Swap ? 1 : -1)) % CollisionColor.Count;
-            var color = CollisionColor.ByInt[colorOrder];
-            var main = particles.main;
-            main.startColor = color.color;
-            audioSource.Play();
-        }
+    public static void Spawn(Vector2 position) {
+        var isRight = Input.mousePosition.x > Screen.width * 0.5f;
+        var instance = Instantiate(Instance.touchParticle);
+        instance.transform.position = new Vector3(position.x, position.y, 5f);
+        var colorOrder = PlayerController.Color.order;
+        colorOrder = (CollisionColor.Count + colorOrder + (isRight ? 1 : -1) * (Instance.Swap ? 1 : -1)) % CollisionColor.Count;
+        var instanceColor = CollisionColor.ByInt[colorOrder].color;
+        instance.Color = instanceColor;
+        Instance.audioSource.Play();
     }
 }

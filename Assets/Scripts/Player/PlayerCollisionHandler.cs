@@ -14,7 +14,7 @@ namespace Player {
             Instance.forceField.gravity = new ParticleSystem.MinMaxCurve(1f);
         }
 
-        private void OnCollisionEnter2D(Collision2D other) {
+        private void OnTriggerEnter2D(Collider2D other) {
             if (other.gameObject.CompareTag("Enemy")) {
                 var enemy = other.gameObject.GetComponent<Enemy>();
 

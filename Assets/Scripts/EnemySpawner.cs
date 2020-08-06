@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Configuration;
-using Common;
+﻿using Common;
 using Player;
-using UnityEditor;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -18,11 +13,9 @@ public class EnemySpawner : SingletonBehaviour<EnemySpawner> {
 
 
     private float nextSpawnTime;
-    private CollisionColor lastSpawnColor;
 
     private void Start() {
         nextSpawnTime = Time.time;
-        lastSpawnColor = CollisionColor.Random;
     }
 
     private void Update() {
@@ -36,7 +29,6 @@ public class EnemySpawner : SingletonBehaviour<EnemySpawner> {
         var pc = PlayerController.Color.order;
         var next = CollisionColor.ByInt[
             (CollisionColor.Count + pc + (Random.value < doubleTapProbability ? 2 : Random.value > .5f ? 1 : -1)) % CollisionColor.Count];
-        lastSpawnColor = next;
         Enemy.Spawn(enemyPrefab, transform, next, startVelocity);
     }
 }

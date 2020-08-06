@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using NaughtyAttributes;
+﻿using NaughtyAttributes;
 using UnityEngine;
 
 public class RoundedButton : MonoBehaviour {

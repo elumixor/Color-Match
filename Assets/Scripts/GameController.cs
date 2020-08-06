@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using Player;
-using TMPro;
 using UI;
 using UnityEngine;
 using UnityEngine.Advertisements;
+using UnityEngine.EventSystems;
 
 public class GameController : SingletonBehaviour<GameController>, IUnityAdsListener {
     [SerializeField] private List<DisplayedAnimationToggle> objectToHide = new List<DisplayedAnimationToggle>();
@@ -14,9 +14,11 @@ public class GameController : SingletonBehaviour<GameController>, IUnityAdsListe
     [SerializeField] private ScoreLabel highscoreLabel;
 
     [SerializeField] private DisplayedAnimationToggle settingsAnimationToggle;
-    
+
     private int score;
     private int highscore;
+
+    private bool isPlaying;
 
     // Track time and conditionally show ads
     private float startTime;
@@ -32,18 +34,24 @@ public class GameController : SingletonBehaviour<GameController>, IUnityAdsListe
     }
 
     private void Start() {
+        Application.targetFrameRate = 60;
+
         GameComponentsEnabled = false;
         highscoreLabel.Score = highscore = PlayerPrefs.GetInt("highscore", 0);
         if (highscore == 0) highscoreLabel.DisplayStars = highscoreLabel.Displayed = false;
 
         scoreLabel.DisplayStars = scoreLabel.Displayed = false;
-        
+
         Advertisement.AddListener(this);
     }
 
     private void Update() {
         // Will react on taps and mouse buttons
-        if (Input.GetMouseButtonDown(0)) OnGameStartedOrResumed();
+        if (Input.touchCount > 0) {
+            var t = Input.GetTouch(0);
+            if (t.phase == TouchPhase.Began && !EventSystem.current.IsPointerOverGameObject(t.fingerId)) OnGameStartedOrResumed();
+        }
+        // if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject()) OnGameStartedOrResumed();
     }
 
     private static bool GameComponentsEnabled {
@@ -71,6 +79,7 @@ public class GameController : SingletonBehaviour<GameController>, IUnityAdsListe
     }
 
     private void OnGameStartedOrResumed() {
+        isPlaying = true;
         // Track time playing
         startTime = Time.time;
 
@@ -102,6 +111,7 @@ public class GameController : SingletonBehaviour<GameController>, IUnityAdsListe
     public static float Elapsed => Mathf.Max(0, Time.time - Instance.startTime);
 
     private void OnGameEnded() {
+        isPlaying = false;
         ComponentsEnabled = false;
         scoreLabel.GetComponent<Animator>().SetBool(FocusedID, true);
 
@@ -124,17 +134,23 @@ public class GameController : SingletonBehaviour<GameController>, IUnityAdsListe
     }
 
     public void ShowSettings() {
+        VolumeAnimator.Enabled = false;
+        CameraShaker.Enabled = false;
         settingsAnimationToggle.Displayed = true;
         GameComponentsEnabled = false;
         Time.timeScale = 0f;
+        enabled = false;
     }
 
     public void HideSettings() {
+        VolumeAnimator.Enabled = true;
+        CameraShaker.Enabled = true;
         settingsAnimationToggle.Displayed = false;
-        GameComponentsEnabled = true;
+        GameComponentsEnabled = isPlaying;
         Time.timeScale = 1f;
+        enabled = !isPlaying;
     }
-    
+
     public void OnUnityAdsReady(string placementId) { }
 
     public void OnUnityAdsDidError(string message) => Debug.LogError(message);

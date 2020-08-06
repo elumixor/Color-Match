@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Diagnostics;
-using NaughtyAttributes;
+﻿using NaughtyAttributes;
 using UnityEditor;
 using UnityEngine;
 using XP;
@@ -17,13 +14,13 @@ namespace Impact {
         public static void Spawn() {
             var r = Instance.radiusThickness.RandomRange();
             var a = Instance.angle.RandomRange() * Mathf.Deg2Rad;
-            var p = new Vector3(r * Mathf.Cos(a), r * Mathf.Sin(a));
+            var p = new Vector3(r * Mathf.Cos(a), r * Mathf.Sin(a), 5);
             Instantiate(Instance.text, Instance.transform).transform.localPosition = p;
 
 
             r = Instance.radiusThickness.RandomRange();
             a = 180 - a;
-            p = new Vector3(-p.x, r * Mathf.Sin(a));
+            p = new Vector3(-p.x, r * Mathf.Sin(a), 5);
             Instantiate(Instance.xp, Instance.transform).transform.localPosition = p;
         }
 

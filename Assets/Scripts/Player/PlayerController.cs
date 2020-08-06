@@ -1,10 +1,21 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Common;
+﻿using Common;
 using UnityEngine;
 
 namespace Player {
     public class PlayerController : SingletonBehaviour<PlayerController> {
+        [SerializeField] private SpeedReactor rotationTime;
+
+        private static readonly int DeadID = Animator.StringToHash("Dead");
+
+        private float delta;
+        private float startTime;
+        private float endTime;
+        private float endAngle;
+        private bool rotating;
+        private float rotation;
+        private float initialRotation;
+        private Animator animator;
+
         public static CollisionColor Color {
             get {
                 var angle = Instance.CurrentAngle;
@@ -24,23 +35,12 @@ namespace Player {
         }
 
         public static void ResetPlayer() {
+            Debug.Log("resetting player!");
             Instance.rotating = false;
             Instance.rotation = Instance.CurrentAngle = Instance.endAngle = Instance.initialRotation;
             Instance.animator.SetBool(DeadID, false);
         }
 
-        [SerializeField] private SpeedReactor rotationTime;
-
-        private static readonly int DeadID = Animator.StringToHash("Dead");
-
-        private float delta;
-        private float startTime;
-        private float endTime;
-        private float endAngle;
-        private bool rotating;
-        private float rotation;
-        private float initialRotation;
-        private Animator animator;
 
         private float CurrentAngle {
             get => transform.localRotation.eulerAngles.z;
@@ -50,20 +50,16 @@ namespace Player {
             }
         }
 
-        protected override void Awake() {
-            base.Awake();
+        private void Start() {
             initialRotation = CurrentAngle;
             endAngle = rotation = initialRotation;
             animator = GetComponent<Animator>();
-            animator.SetBool(DeadID, false);
-        }
-
-        private void Start() {
             PlayerCollisionHandler.OnCollided += delegate { animator.SetBool(DeadID, true); };
         }
 
 
         private void Rotate(float angle) {
+            // Debug.Log($"rotate {angle}");
             var r = rotationTime;
             startTime = Time.time;
             endTime = Time.time + r;

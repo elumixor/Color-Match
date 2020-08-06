@@ -1,5 +1,4 @@
-﻿using System;
-using Common;
+﻿using Common;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -18,7 +17,7 @@ public class Enemy : MonoBehaviour {
         spawnTime = Time.time;
     }
 
-    private void OnCollisionEnter2D(Collision2D _) {
+    private void OnTriggerEnter2D(Collider2D other) {
         CameraShaker.Shake();
         VolumeAnimator.Animate();
         SpawnParticles();
